@@ -1,0 +1,86 @@
+// Konfiguracja
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// MODELE
+
+model Game {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  genre       String[]
+  releaseYear Int
+  coverImage  String
+  rating      Float?
+  platform    String[]
+  developer   String?
+  publisher   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relacje
+  articles    Article[]
+  characters  Character[]
+  items       Item[]
+  
+  @@index([slug])
+  @@index([releaseYear])
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  excerpt     String?  @db.Text
+  coverImage  String?
+  publishedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relacja do gry
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId      String
+  
+  @@index([slug])
+  @@index([gameId])
+}
+
+model Character {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  bio         String   @db.Text
+  role        String?  // "Protagonist", "Antagonist", "NPC", "Companion"
+  imageUrl    String?
+  
+  // Relacja do gry
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId      String
+  
+  @@index([slug])
+  @@index([gameId])
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  type        String   // "Weapon", "Armor", "Consumable", "Quest"
+  rarity      String?  // "Common", "Rare", "Epic", "Legendary"
+  imageUrl    String?
+  
+  // Relacja do gry
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId      String
+  
+  @@index([slug])
+  @@index([gameId])
+}

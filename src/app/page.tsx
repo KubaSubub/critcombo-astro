@@ -1,108 +1,144 @@
-import ContentGrid from "@/components/ContentGrid";
-import GameCard from "@/components/GameCard";
-import Link from "next/link";
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
+import HeroSection from '@/components/content/HeroSection';
+import GameCard from '@/components/content/GameCard';
+import { GameCardSkeleton } from '@/components/skeletons/GameCardSkeleton';
 
 export default function Home() {
-  const games = [
-    {
-      id: 1,
-      title: "Cyberpunk 2077",
-      image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=2670&ixlib=rb-4.0.3",
-      rating: 9.5,
-      tags: ["RPG", "Sci-Fi", "Open World"],
-    },
-    {
-      id: 2,
-      title: "Elden Ring",
-      image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=2671&ixlib=rb-4.0.3",
-      rating: 9.8,
-      tags: ["RPG", "Fantasy", "Hardcore"],
-    },
-    {
-      id: 3,
-      title: "Starfield",
-      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2672&ixlib=rb-4.0.3",
-      rating: 8.5,
-      tags: ["RPG", "Space", "Exploration"],
-    },
-    {
-      id: 4,
-      title: "Baldur's Gate 3",
-      image: "https://images.unsplash.com/photo-1635322966219-b75ed372eb01?auto=format&fit=crop&q=80&w=2664&ixlib=rb-4.0.3",
-      rating: 10.0,
-      tags: ["RPG", "Fantasy", "Strategy"],
-    },
-    {
-      id: 5,
-      title: "Armored Core VI",
-      image: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&q=80&w=2535&ixlib=rb-4.0.3",
-      rating: 9.2,
-      tags: ["Action", "Mecha", "Sci-Fi"],
-    },
-    {
-      id: 6,
-      title: "Hollow Knight",
-      image: "https://images.unsplash.com/photo-1506318137071-a8bcbf67cc77?auto=format&fit=crop&q=80&w=2670&ixlib=rb-4.0.3",
-      rating: 9.6,
-      tags: ["Metroidvania", "Indie", "2D"],
-    },
-    {
-      id: 7,
-      title: "Call of Duty: MW3",
-      image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=2670&ixlib=rb-4.0.3",
-      rating: 7.0,
-      tags: ["FPS", "Multiplayer", "Shooter"],
-    },
-    {
-      id: 8,
-      title: "Final Fantasy XVI",
-      image: "https://images.unsplash.com/photo-1519669556860-2c96b56b024c?auto=format&fit=crop&q=80&w=2670&ixlib=rb-4.0.3",
-      rating: 8.8,
-      tags: ["RPG", "Fantasy", "Action"],
+  const [isLoading, setIsLoading] = useState(true);
+  const [games, setGames] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchGames() {
+      try {
+        const res = await fetch('/api/games');
+        if (res.ok) {
+          const data = await res.json();
+          setGames(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch games', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  ];
+
+    fetchGames();
+  }, []);
+
+  const reverseGames = [...games].reverse();
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex flex-col gap-4 border-b border-hud-border pb-8">
-        <h1 className="font-mono text-4xl font-bold uppercase tracking-tighter text-text-highlight md:text-6xl">
-          Crit<span className="text-accent-primary">Combo</span>
-          <span className="ml-2 text-base font-normal tracking-normal text-text-muted opacity-70">
-            &#47;&#47; DB_VERSION: 1.0.0
-          </span>
-        </h1>
-        <p className="max-w-2xl text-lg text-text-muted">
-          The next-generation gaming encyclopedia. Built for speed, designed for data.
-          <br />
-          <Link href="/article" className="text-accent-primary underline decoration-accent-primary/50 underline-offset-4 hover:decoration-accent-primary">
-            Check Typography Test (Article View)
-          </Link>
-        </p>
+    <div className="space-y-16">
+      {/* HERO SECTION */}
+      <HeroSection />
+
+      {/* AD SLOT - LEADERBOARD */}
+      <div className="ad-slot max-w-4xl mx-auto">
+        <div className="ad-label">REKLAMA</div>
+        <span className="text-[10px] text-text-muted font-display tracking-widest">GOOGLE_ADSENSE_LEADERBOARD_[728x90]</span>
       </div>
 
-      <ContentGrid title="Trending Games">
-        {games.map((game) => (
-          <GameCard
-            key={game.id}
-            title={game.title}
-            image={game.image}
-            rating={game.rating}
-            tags={game.tags}
-          />
-        ))}
-      </ContentGrid>
+      {/* NOWOŚCI SECTION */}
+      <section>
+        <div className="mb-8 flex items-end justify-between border-b border-white/5 pb-4">
+          <div>
+            <h2 className="text-2xl font-display font-black text-text-primary">NOWOŚCI</h2>
+            <p className="mt-1 font-body text-xs text-text-secondary">Najnowsze wpisy w encyklopedii</p>
+          </div>
+          <a href="#" className="font-display text-[10px] tracking-widest text-accent-primary hover:underline transition-colors duration-300">ZOBACZ WSZYSTKO &gt;</a>
+        </div>
 
-      <ContentGrid title="Recent Reviews">
-        {games.slice(0, 4).reverse().map((game) => (
-          <GameCard
-            key={game.id}
-            title={game.title}
-            image={game.image}
-            rating={game.rating}
-            tags={game.tags}
-          />
-        ))}
-      </ContentGrid>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {isLoading ? (
+            [...Array(6)].map((_, i) => <GameCardSkeleton key={i} />)
+          ) : (
+            games.slice(0, 6).map((game, i) => (
+              <GameCard
+                key={game.id || i}
+                title={game.title}
+                genre={game.genre?.[0] || "RPG"}
+                year={game.releaseYear}
+                rating={game.rating || 0}
+                image={game.coverImage}
+                slug={game.slug}
+                delay={i * 50}
+              />
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* RETRO KLASYKI - HORIZONTAL SCROLL */}
+      <section>
+        <div className="mb-8 flex items-end justify-between border-b border-white/5 pb-4">
+          <div>
+            <h2 className="text-2xl font-display font-black text-text-primary">RETRO KLASYKI</h2>
+            <p className="mt-1 font-body text-xs text-text-secondary">Fundamenty gamingu</p>
+          </div>
+        </div>
+
+        <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x">
+          {isLoading ? (
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="w-[280px] flex-shrink-0">
+                <GameCardSkeleton />
+              </div>
+            ))
+          ) : (
+            reverseGames.slice(0, 4).map((game, i) => (
+              <div key={i} className="w-[280px] flex-shrink-0 snap-start">
+                <GameCard
+                  title={game.title}
+                  genre={game.genre?.[0] || "RPG"}
+                  year={game.releaseYear}
+                  rating={game.rating || 0}
+                  image={game.coverImage}
+                  slug={game.slug}
+                  delay={i * 50}
+                />
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* POLECANE SECTION - GRID */}
+      <section>
+        <div className="mb-8 flex items-end justify-between border-b border-white/5 pb-4">
+          <div>
+            <h2 className="text-2xl font-display font-black text-text-primary">POLECANE</h2>
+            <p className="mt-1 font-body text-xs text-text-secondary">Wybrane przez redakcję</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {isLoading ? (
+            [...Array(6)].map((_, i) => <GameCardSkeleton key={i} />)
+          ) : (
+            games.slice(0, 6).map((game, i) => (
+              <GameCard
+                key={game.id || i}
+                title={game.title}
+                genre={game.genre?.[0] || "RPG"}
+                year={game.releaseYear}
+                rating={game.rating || 0}
+                image={game.coverImage}
+                slug={game.slug}
+                delay={i * 50}
+              />
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* AD SLOT - BOTTOM BOX */}
+      <div className="ad-slot max-w-sm mx-auto">
+        <div className="ad-label">REKLAMA</div>
+        <span className="text-[10px] text-text-muted font-display tracking-widest">GOOGLE_ADSENSE_BOX_[300x250]</span>
+      </div>
     </div>
   );
 }
